@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Game</title>
+</head>
+<body>
+    <h1>Update Game in List</h1>
+    <a href="index.html">Back to Game List</a>
+    <br>
+    <form action="/update" method="POST">
+            <input type = "text" name = "id" id = "id" value = "" hidden>
+            <label for="GameName">Game Name</label>
+            <input type = "text" name="GameName" placeholder="GameName" id="GameName">
+            <br>
+            <label for="Publisher">Publisher</label>
+            <input type = "text" name="Publisher" id="Publisher">
+            <br>
+            <label for="Developer">Developer</label>
+            <input type = "text" name="Developer" id="Developer">
+            <br>
+            <button type="submit">Update Game</button>
+    </form>
+    <script>
+        // Get the query parameters from the URL
+        const urlParams = new URLSearchParams(window.location.search);
+
+        // Retrieve the values from the query parameters
+        const itemId = urlParams.get('id');
+        const gameName = urlParams.get('GameName');
+        const publisher = urlParams.get('Publisher');
+        const developer = urlParams.get('Developer');
+
+        // Set the values in the form fields
+        if (gameName) document.getElementById('GameName').value = gameName;
+        if (publisher) document.getElementById('Publisher').value = publisher;
+        if (developer) document.getElementById('Developer').value = developer;
+        if (itemId) document.getElementById('id').value = itemId;  // Set the hidden input with the item ID
+    </script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add user page</title>
+</head>
+<body>
+    <h1>Add Game To List</h1>
+    <a href="index.html">Back to Game List</a>
+    <br>
+    <form action="/addItem" method="POST">
+        <label for="GameName">Game Name</label>
+        <input type = "text" name="GameName" placeholder= "Game Name" id="GameName">
+        <br>
+        <label for="Publisher">Publisher</label>
+        <input type = "text" name="Publisher" id="Publisher">
+        <br>
+        <label for="Developer">Developer</label>
+        <input type = "text" name="Developer" id="Developer">
+        <br>
+        <button type="submit">Add Game</button>
+    </form>
+</body>
+</html>

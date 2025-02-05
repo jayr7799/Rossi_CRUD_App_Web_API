@@ -2,6 +2,10 @@ const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const path = require("path");
+const session = require("express-session");
+const bcrypt = require("bcryptjs");
+const User = require("./models/user");
+const Item = require("./models/Item");
 
 const app = express();
 const port = process.env.port || 3000;
@@ -12,6 +16,19 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(bodyParser.json());
 app.use(express.urlencoded({extended:true}));
 
+//sets up the session variable
+app.use(session({
+    secret:"12345",
+    resave:false,
+    saveUninitialized:false,
+    cookie:{secure:false}// Set to true is using https
+}));
+
+function isAuthenticated(req,res, next){
+    if(req.session.user)return next();
+    return res.redirect("/login");
+}
+
 //mongoDB connection setup
 const mongoURI = "mongodb://localhost:27017/crudVideoGames";
 mongoose.connect(mongoURI);
@@ -21,15 +38,29 @@ db.on("error", console.error.bind(console, "MongoDB Connection Error"));
 db.once("open", ()=>{console.log("Connected to MongoDB database")});
 
 //set up mongoose schema
-const itemSchema = new mongoose.Schema({
-        GameName:String,
-        Publisher:String,
-        Developer:String
-    });
 
-const Item = mongoose.model("Item", itemSchema, "videoGames");
 
 app.get("/", (req, res)=> {res.sendFile("index.html")}); //app routes
+
+app.get("/users",isAuthenticated, (req,res)=>{
+    res.sendFile(path.join(__dirname, "public","users.html"));
+});
+app.get("/update",isAuthenticated, (req,res)=>{
+    res.sendFile(path.join(__dirname, "public","update.html"));
+});
+app.get("/login", (req,res)=>{
+    res.sendFile(path.join(__dirname  + "/public/login.html"));
+});
+
+app.get("/logout", (req, res)=>{
+    req.session.destroy(()=>{
+        res.redirect("/login");
+    });
+});
+
+app.get("/register", (req, res)=>{
+    res.sendFile(path.join(__dirname + "/public/register.html"))
+});
 
 //read routes
 app.get("/videoGames", async (req,res)=>{
@@ -74,6 +105,34 @@ app.post("/addItem", async (req, res)=>{
     catch(err)
     {
         res.status(501).json({error:"{Failed to add new item}"});
+    }
+});
+
+app.post("/login", async (req,res)=>{
+    const {username, password} = req.body;
+    console.log(req.body);
+    const user = await User.findOne({username});
+    if(user && bcrypt.compareSync(password, user.password)){
+        req.session.user = username;
+        return res.redirect("/users");
+    }
+    req.session.error = "Invalid User";
+    return res.redirect("/login")
+});
+
+app.post("/register", async (req, res)=>{
+    try
+    {
+        const {username, password, email} = req.body;
+        const existingUser = await User.findOne({username});
+        if(existingUser) return res.send("Username already taken. Try Again.");
+        const hashedPassword = bcrypt.hashSync(password, 10);
+        const newUser = new User({username, password:hashedPassword, email});
+        await newUser.save();
+        res.redirect("/login");
+    }catch(err)
+    {
+        res.status(500).send("Error: Failed to register user.");
     }
 });
 

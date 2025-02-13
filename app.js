@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
@@ -18,7 +19,7 @@ app.use(express.urlencoded({extended:true}));
 
 //sets up the session variable
 app.use(session({
-    secret:"12345",
+    secret:process.env.SESSION_SECRET,
     resave:false,
     saveUninitialized:false,
     cookie:{secure:false}// Set to true is using https
@@ -30,7 +31,7 @@ function isAuthenticated(req,res, next){
 }
 
 //mongoDB connection setup
-const mongoURI = "mongodb://localhost:27017/crudVideoGames";
+const mongoURI = process.env.MONGODB_URI; //"mongodb://localhost:27017/crudVideoGames";
 mongoose.connect(mongoURI);
 const db = mongoose.connection;
 
@@ -38,8 +39,6 @@ db.on("error", console.error.bind(console, "MongoDB Connection Error"));
 db.once("open", ()=>{console.log("Connected to MongoDB database")});
 
 //set up mongoose schema
-
-
 app.get("/", (req, res)=> {res.sendFile("index.html")}); //app routes
 
 app.get("/users",isAuthenticated, (req,res)=>{
@@ -173,3 +172,5 @@ app.delete("/deleteItem/GameName", async (req,res)=>{
 });
 
 app.listen(port, ()=>{console.log(`Server is Running On port ${port}`)}); //Starts server
+
+module.exports = app;

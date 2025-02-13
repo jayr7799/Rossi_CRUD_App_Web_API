@@ -17,7 +17,7 @@ const fetchUsers = async()=>{
             const updateButton = document.createElement("button");
             const deleteButton = document.createElement("button");
             itemDiv.className = "item";
-            itemDiv.innerHTML = `Game Title: ${item.GameName} Publisher: ${item.Publisher} Developer: ${item.Developer}`;
+            itemDiv.innerHTML = `<br>Game Title: ${item.GameName}<br> Publisher: ${item.Publisher}<br> Developer: ${item.Developer}`;
             updateButton.data = item.GameName;
             updateButton.innerHTML = 'Update';
             deleteButton.data = item.GameName;
